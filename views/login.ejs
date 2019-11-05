@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title><%= applicationName %> Login</title>
+
+    <meta name="description" content="Palm">
+    <meta name="author" content="Tim Clancy">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="page-header">
+            <h1>
+              <%= applicationName %> Account <small>Dashboard</small>
+            </h1>
+          </div>
+
+          <div id="loginBox" class="panel panel-default">
+            <h2>
+              Login
+            </h2>
+            You can log into <%= applicationName %> here.
+            <br />
+
+            <form action="/login" method="post">
+              Username:
+              <br />
+              <input type="text" id="usernameInput" name="username">
+              <br>
+              Password:
+              <br />
+              <input type="password" id="passwordInput" name="password">
+              <br />
+              <input type="submit" value="Login">
+            </form>
+          </div>
+
+          <div id="errorBox" class="collapse alert alert-danger" role="alert">
+            This is where we display errors.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Retrieve variables being passed from the server. -->
+    <script>
+      window.serverData = {};
+      window.serverData.error = <%- error %>;
+    </script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/loginScripts.js"></script>
+  </body>
+</html>

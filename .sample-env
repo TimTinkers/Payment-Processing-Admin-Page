@@ -1,0 +1,95 @@
+# Basic application settings.
+APPLICATION=
+EXPRESS_PORT=3002
+BASE_URI=
+
+# Game internal account management settings.
+GAME_JWKS_URI=
+GAME_LOGIN_URI=
+GAME_PROFILE_URI=
+GAME_INVENTORY_URI=
+GAME_MINT_SCREEN_URI=
+GAME_METADATA_URI=
+GAME_REMOVE_ITEM_URI=
+GAME_ADMIN_USERNAME=
+GAME_ADMIN_PASSWORD=
+
+# Enjin configuration settings.
+ENJIN_PLATFORM_URL=https://kovan.cloud.enjin.io/graphql/
+ENJIN_ADMIN_EMAIL=
+ENJIN_ADMIN_PASSWORD=
+GAME_APP_ID=
+
+# Database configuration settings.
+DATABASE_HOST=
+DATABASE_USER=
+DATABASE_PASSWORD=
+DATABASE_PORT=3306
+DATABASE=
+TIMEOUT=30000
+NETWORK_SUFFIX=kovan
+
+# Define the services offered for sale by this server and their prices.
+ASCENSION_ENABLED=true
+ASCENSION_COST=1.00
+ASCENSION_DESCRIPTION=Ascending an item allows you to move it onto Enjin's blockchain-backed platform.
+
+# Configuring PayPal as a potential payment processing option.
+PAYPAL_ENABLED=true
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+PAYPAL_PURCHASE_DESCRIPTION=Purchasing the movement of items to the Ethereum blockchain via Enjin.
+
+# You likely don't need to configure anything below this line.
+
+# Enjin query and mutation strings.
+ENJIN_LOGIN_QUERY=query login($email: String!, $password: String!) { request: EnjinOauth(email: $email, password: $password) { access_tokens, id, identities { id, app_id, ethereum_address } } }
+ENJIN_SEARCH_MUTATION=query getAppMembers($appId : Int) { result: EnjinApp(id: $appId) { identities { ethereum_address, linking_code, linking_code_qr, user { email } } } }
+ENJIN_INVENTORY_QUERY=query getItemBalances($address: String!) { result: EnjinIdentities(ethereum_address: $address) { tokens(include_creator_tokens: true) { token_id, app_id, name, balance, index, itemURI } } }
+ENJIN_INVITE_MUTATION=mutation inviteUser($email: String!) { UpdateEnjinApp(invite: { email: $email }) { id } }
+ENJIN_ALREADY_INVITED_ERROR=Bad Request - UpdateEnjinApp : This user already has an identity for this app.
+ENJIN_MINT_MUTATION=mutation mintItem($id: Int!, $tokenId: String!, $address: String!, $amount: Int!) { request: CreateEnjinRequest(appId: $id, type: MINT, mint_token_data: { token_id: $tokenId, recipient_address_array: [$address], value_array: [$amount]}) { id, encoded_data, state } }
+
+# Database MySQL queries.
+AVAILABLE_SERVICES_QUERY=SELECT itemSales.`serviceId`, itemSales.`itemId`, itemDetails.`metadata`, itemSales.`amount`, itemSales.`price`, itemSupplies.`availableForSale` FROM `%s`.`item_sales` AS itemSales JOIN `%s`.`item_supplies` AS itemSupplies ON itemSales.`itemId`=itemSupplies.`itemId` JOIN `%s`.`items` AS itemDetails ON itemSales.`itemId` = itemDetails.`itemId` WHERE `isActive`=1 AND itemSales.`itemId` IN (?);
+GET_NEXT_ORDER_ID=SELECT AUTO_INCREMENT FROM `information_schema`.`tables` WHERE `table_name`='item_order_details' AND `table_schema`=DATABASE();
+INSERT_ORDER_DETAILS=INSERT INTO `%s`.`item_order_details` (`orderId`, `userId`, `cost`, `provider`, `details`) VALUES (?, ?, ?, ?, ?);
+INSERT_ORDER_STATUS=INSERT INTO `%s`.`item_order_status` (`orderId`, `status`, `time`, `details`) VALUES (?, ?, NOW(), ?);
+GET_ORDER_DETAILS=SELECT * FROM `%s`.`item_order_details` WHERE `orderId`=?;
+UPDATE_LAST_ADDRESS=UPDATE `%s`.`users` SET `lastAddress`=? WHERE `playerId`=?;
+GET_LAST_ADDRESS=SELECT `lastAddress` FROM `%s`.`users` WHERE `playerId`=?;
+GET_ENJIN_ITEM_ID=SELECT `enjinId` FROM `%s`.`item_mapping_%s` WHERE `itemId`=?;
+GET_VALID_ENJIN_ITEMS=SELECT `enjinId` FROM `%s`.`item_mapping_%s`;
+GET_VALID_GAME_ITEMS=SELECT `itemId` FROM `%s`.`item_mapping_%s`;
+
+# Errors and other messages.
+SETUP_STARTING=%s item server is starting on port %d ...
+ENJIN_LOGIN_SUCCESS_MESSAGE=* Enjin administrator for %s is available as user %d with identity %d and address %s.
+SETUP_COMPLETED=... %s item exchange server listening on port %d.
+INVALID_GAME_ADMIN_CREDENTIALS=You must specify game administrator credentials in .env!
+GAME_SETUP_ERROR=Unable to log in as %s administrator. Check your credentials.
+INVALID_ENJIN_ADMIN_CREDENTIALS=You must specify Enjin administrator credentials in .env!
+ENJIN_SETUP_ERROR=Unable to log in as Enjin administrator. Check your credentials.
+INVALID_PAYPAL_CREDENTIALS=You must specify Paypal credentials in .env!
+PAYPAL_SETUP_ERROR=Unable to setup the PayPal client. Check your credentials.
+SIGNING_KEY_RETRIEVAL_ERROR=Could not retrieve the signing key for verifying the game administrator's access token.
+GAME_COULD_NOT_LOGIN_ERROR=Your access token cannot be verified. Please log in again.
+NO_LOGIN_DETAILS=You must provide valid login details.
+USER_UNABLE_TO_LOGIN=Unable to login with that username or password.
+INVENTORY_RETRIEVAL_FAILED=Could not retrieve the user's inventory.
+EXISTING_ENJIN_IDENTITY_FAILED=Could not find the user's existing identity.
+GAME_UNABLE_TO_RETRIEVE_PROFILE=Unable to retrieve your profile information.
+GAME_UNABLE_TO_RETRIEVE_INVENTORY=Unable to retrieve your inventory information.
+GAME_UNABLE_TO_SCREEN_INVENTORY=Unable to screen your mintable inventory items.
+EMPTY_ASCENSION_ERROR=You must specify at least one item to ascend.
+ITEMS_NOT_OWNED_ERROR=You do not have these items available to ascend.
+PAYPAL_DISABLED_ERROR=PayPal is not enabled as a payment option.
+PAYPAL_ORDER_CREATION_ERROR=PayPal could not create the requested order.
+PAYPAL_CAPTURE_ERROR=Error capturing response to PayPal transaction approval.
+PAYPAL_ORDER_VERIFICATION_FAILED=Could not validate that the captured order was correctly-priced.
+ASCENSION_DISABLED_ERROR=The item ascension service is not enabled.
+NO_ASCENSION_ITEMS_CHOSEN=You must specify items to ascend.
+OUT_OF_STOCK=There are not enough items left in stock to cover your requested order.
+UNKNOWN_PAYMENT_PROCESSOR=You must specify a valid payment processor.
+UNKNOWN_ERROR=Unknown error occurred when trying to invite the user to Enjin.
+UNKNOWN_SERVICE_REQUESTED=The service that you requested to purchase is unknown.

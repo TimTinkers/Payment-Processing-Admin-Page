@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title><%= applicationName %> Dashboard</title>
+
+    <meta name="description" content="Palm">
+    <meta name="author" content="Tim Clancy">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="page-header">
+            <h1>
+              <%= applicationName %> <small>Dashboard</small>
+            </h1>
+          </div>
+
+          <!-- A panel for displaying error messages to the user. -->
+          <div id="errorBox" class="collapse alert alert-danger" role="alert">
+            This is where we display errors.
+          </div>
+
+          <!-- A panel for displaying status messages to the user. -->
+          <div id="messageBox" class="collapse alert alert-success" role="alert">
+            This is where we display status messages.
+          </div>
+
+          <!-- A panel for displaying the user's profile information. -->
+          <div class="panel panel-default">
+            <h2>
+              Your Profile
+            </h2>
+
+            <!-- This section loads information after a skeleton. -->
+            <div id="profileTitle">
+              Your profile data:
+            </div>
+            <div id="profileSpinner" class="d-flex justify-content-center">
+              <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+            <ul id="profileInformation" style="list-style-type:circle">
+            </ul>
+          </div>
+
+          <!-- A panel for displaying payment processor service information. -->
+          <div class="panel panel-default">
+            <h2>
+              The Payment Processor
+            </h2>
+
+            <!-- This section loads information after a skeleton. -->
+            <div id="processorTitle">
+              Processor data:
+            </div>
+            <div id="processorSpinner" class="d-flex justify-content-center">
+              <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+            <ul id="processorInformation" style="list-style-type:circle">
+            </ul>
+          </div>
+
+          <!-- A panel for displaying all services available. -->
+          <div class="panel panel-default">
+            <h2>
+              All Services
+            </h2>
+
+            <!-- This section loads information after a skeleton. -->
+            <div id="serviceTitle">
+              Services:
+            </div>
+            <div id="serviceSpinner" class="d-flex justify-content-center">
+              <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+            <ul id="serviceInformation" style="list-style-type:circle">
+            </ul>
+          </div>
+
+          <!-- Input for adding a new service to the payment processor. -->
+          <input id="serviceName" type="text">
+          <input id="serviceCost" type="number">
+          <button id="addService" class="btn btn-primary">Add a Service</button>
+          <br>
+
+          <!-- Input for updating a service on the payment processor. -->
+          <input id="updateServiceId" type="number">
+          <input id="updateServiceName" type="text">
+          <input id="updateServiceCost" type="number">
+          <input id="updateServiceEnabled" type="checkbox" checked>
+          <button id="updateService" class="btn btn-primary">Update a Service</button>
+          <br>
+
+          <!-- A button that logs the user out. -->
+          <button id="logoutButton" class="btn btn-primary">Logout</button>
+
+          <!-- An alert for the most-recent error to be displayed. -->
+          <div id="errorBox" class="collapse alert alert-danger" role="alert">
+            This is where we display errors.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Retrieve variables being passed from the server. -->
+    <script>
+      window.serverData = {};
+      window.serverData.metadataUri = '<%= gameMetadataUri %>';
+      window.serverData.profileUri = '<%= gameProfileUri %>';
+    </script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/js.cookie.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap-input-spinner.js"></script>
+    <script src="/js/dashboardScript.js"></script>
+  </body>
+</html>
