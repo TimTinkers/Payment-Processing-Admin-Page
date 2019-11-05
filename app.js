@@ -364,3 +364,26 @@ app.post('/update-service', asyncMiddleware(async (req, res, next) => {
 		}
 	});
 }));
+
+// TODO: refactor the contract to include an order-id mapping keyed to purchase type.
+// Look up the purchase history registered to a single user's address.
+app.post('/lookup-address', asyncMiddleware(async (req, res, next) => {
+	loginValidator(req, res, async function (gameToken, decoded) {
+		try {
+			let purchaseAddress = req.body.purchaseAddress;
+			let transaction = await PAYMENT_PROCESSOR.getPurchases(purchaseAddress);
+
+			// Look up the order status of each pending purchase.
+			let sql = util.format(process.env.GET_PENDING_ETHER_PURCHASES, process.env.DATABASE);
+			let rows = await DATABASE_CONNECTION.query(sql);
+
+			// Return the state.
+			res.send({ status: 'SUCCESS', transaction: transaction, orderDetails: rows[0] });
+
+		// If we are unable to retrieve state, log an error and notify the admin.
+		} catch (error) {
+			console.error(process.env.CONTRACT_UNABLE_TO_LOOKUP_ADDRESS, error);
+			res.send({ status: 'ERROR', message: process.env.CONTRACT_UNABLE_TO_LOOKUP_ADDRESS });
+		}
+	});
+}));

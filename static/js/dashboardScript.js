@@ -175,6 +175,25 @@ let setup = async function (config) {
 		}
 	});
 
+	// Assign functionality to the address lookup button.
+	$('#addressLookup').click(async function () {
+		let purchaseAddress = $('#purchaseAddress').val();
+		let addressLookupResponse = await $.post('/lookup-address', { purchaseAddress: purchaseAddress });
+
+		// Refresh our display if the address lookup succeeded.
+		if (addressLookupResponse.status === 'SUCCESS') {
+			$('#addressLookupOutput').html(JSON.stringify(addressLookupResponse));
+
+		// Handle an error from the processor.
+		} else if (addressLookupResponse.status === 'ERROR') {
+			showError(addressLookupResponse.message);
+
+		// Handle an unknown error from retrieving the processor's services.
+		} else {
+			showError('Received an unknown error from looking up an address on the processor.');
+		}
+	});
+
 	// Assign functionality to the example logout button.
 	$('#logoutButton').click(async function () {
 		$.post('/logout', function (data) {
