@@ -365,20 +365,38 @@ app.post('/update-service', asyncMiddleware(async (req, res, next) => {
 	});
 }));
 
-// TODO: refactor the contract to include an order-id mapping keyed to purchase type.
 // Look up the purchase history registered to a single user's address.
 app.post('/lookup-address', asyncMiddleware(async (req, res, next) => {
 	loginValidator(req, res, async function (gameToken, decoded) {
 		try {
 			let purchaseAddress = req.body.purchaseAddress;
-			let transaction = await PAYMENT_PROCESSOR.getPurchases(purchaseAddress);
 
-			// Look up the order status of each pending purchase.
-			let sql = util.format(process.env.GET_PENDING_ETHER_PURCHASES, process.env.DATABASE);
-			let rows = await DATABASE_CONNECTION.query(sql);
+			// Retrieve a user's on-chain order history.
+			let purchaseHistory = await PAYMENT_PROCESSOR.getPurchases(purchaseAddress);
+			let orderHistory = await PAYMENT_PROCESSOR.getOrders(purchaseAddress);
+			orderHistory = orderHistory.substr(1);
+			let orderIds = orderHistory.split(';');
 
-			// Return the state.
-			res.send({ status: 'SUCCESS', transaction: transaction, orderDetails: rows[0] });
+			// Return a set of this user's order history.
+			let orders = [];
+			for (let i = 0; i < purchaseHistory.length; i++) {
+				let serviceId = parseInt(purchaseHistory[i]['_hex'], 16);
+				let orderId = orderIds[i];
+
+				// Retrieve the final fulfillment status of each order in our database.
+				let sql = util.format(process.env.GET_ORDER_STATUS, process.env.DATABASE);
+				let values = [ orderId ];
+				let statusRows = await DATABASE_CONNECTION.query(sql, values);
+				let orderStatus = statusRows[0];
+				orders.push({
+					serviceId: serviceId,
+					orderId: orderId,
+					orderStatus: orderStatus
+				});
+			}
+
+			// Return the full order history for this address.
+			res.send({ status: 'SUCCESS', orders: orders });
 
 		// If we are unable to retrieve state, log an error and notify the admin.
 		} catch (error) {
